@@ -5,83 +5,308 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบบันทึกเวลางาน SNAC</title>
     <style>
-        :root { --primary: #007bff; --success: #28a745; --danger: #dc3545; --warning: #ffc107; --purple: #6f42c1; --info: #17a2b8; }
-        body { font-family: 'Sarabun', sans-serif; padding: 20px; background: #f0f2f5; position: relative; }
-        .btn-back { position: absolute; top: 15px; left: 15px; padding: 8px 15px; background: #fff; border: 1px solid #ccc; border-radius: 20px; text-decoration: none; color: #333; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .container { max-width: 450px; margin: 45px auto auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; margin-bottom: 20px; color: #1a1a1a; font-size: 22px; font-weight: bold; }
+        :root { 
+            --primary: #0d6efd; 
+            --success: #198754; 
+            --danger: #dc3545; 
+            --warning: #ffc107; 
+            --purple: #8d49f7; 
+            --info: #0dcaf0; 
+            --bg-dark: #121212;
+            --card-dark: #1e1e1e;
+            --border-dark: #333333;
+            --text-main: #e0e0e0;
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            padding: 20px; 
+            background: var(--bg-dark) !important; 
+            color: var(--text-main) !important;
+            position: relative; 
+            margin: 0;
+        }
+
+      /*  .btn-back { 
+            position: fixed; 
+            top: 50px; 
+            left: 50px; 
+            padding: 5px 12px; 
+            background: #2a2a2a; 
+            border: 1px solid var(--border-dark); 
+            border-radius: 20px; 
+            text-decoration: none; 
+            color: #fff; 
+            font-size: 11px; 
+            font-weight: bold; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        } */
+
+        .container { 
+            max-width: 450px; 
+            margin: 45px auto auto; 
+            background: var(--card-dark); 
+            padding: 25px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-dark);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6); 
+        }
+
+        h2 { text-align: center; margin-bottom: 20px; color: #ffffff; font-size: 22px; font-weight: bold; }
         #camera-box { display: none; margin-bottom: 15px; text-align: center; }
-        video { width: 100%; border-radius: 8px; background: #000; }
+        video { width: 100%; border-radius: 8px; background: #000; border: 1px solid var(--border-dark); }
         canvas { display: none; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; transition: 0.2s; }
+        
+        .btn { 
+            width: 100%; padding: 15px; border: none; border-radius: 8px; 
+            font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; transition: 0.2s; 
+        }
+
         .btn-camera { background: var(--primary); color: white; }
         .btn-snap { background: var(--warning); color: #000; }
-        .btn-group { display: none; gap: 10px; }
+        .btn-group { display: none; gap: 10px; width: 100%; }
         .btn-in { background: var(--success); color: white; flex: 1; }
+        .btn-afternoon { background-color: #0b5ed7 !important; color: white !important; display: none; }
         .btn-out { background: var(--danger); color: white; flex: 1; }
-        .special-group { display: none; flex-direction: column; margin-top: 10px; border-top: 2px dashed #eee; padding-top: 15px; }
+        .special-group { display: none; flex-direction: column; margin-top: 10px; border-top: 2px dashed var(--border-dark); padding-top: 15px; }
         .btn-leave { background: var(--purple); color: white; }
-        .btn-absent { background: #6c757d; color: white; }
-        .btn-sick { background: var(--info); color: white; }
-        #result { display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 16px; }
+        .btn-absent { background: #495057; color: white; }
+        .btn-sick { background: var(--info); color: #000; }
+        
+        #result { 
+            display: none; background: #2a2a2a; color: #fff; padding: 15px; 
+            border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary); flex-direction: column; 
+        }
+        
         #loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 10px; }
-        .btn-info-personal { background: #fff; color: #333; border: 2px solid #ccc; margin-top: 5px; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: white; width: 100%; max-width: 420px; border-radius: 16px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .pin-input { width: 80%; padding: 12px; font-size: 24px; text-align: center; letter-spacing: 15px; border: 2px solid #ced4da; border-radius: 10px; margin: 15px auto; display: block; }
+        .btn-info-personal { background: #2a2a2a; color: #fff; border: 1px solid var(--border-dark); margin-top: 5px; }
+
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; 
+        }
+
+        .modal-box { 
+            background: var(--card-dark); color: var(--text-main); width: 100%; max-width: 420px; 
+            border-radius: 16px; padding: 25px; border: 1px solid var(--border-dark); box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+        }
+
         .stat-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-        .stat-card { background: #f8f9fa; border: 1px solid #e3e6f0; border-radius: 8px; padding: 10px; text-align: center; flex: 1; min-width: 45%; box-sizing: border-box; }
-        .stat-num { font-size: 18px; font-weight: bold; display: block; }
-        .table-wrap { max-height: 180px; overflow-y: auto; font-size: 14px; border: 1px solid #eee; border-radius: 8px; width: 100%; }
-        .modal-btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .cry-emoji { font-size: 80px; animation: bounce 1s infinite alternate; text-align: center; margin-bottom: 10px; }
-        .cry-text { font-size: 22px; font-weight: bold; color: var(--danger); text-align: center; margin-bottom: 15px; }
-        .countdown-text { text-align: center; color: #666; font-size: 14px; }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-    </style>
+        .stat-card { background: #262626; border: 1px solid var(--border-dark); border-radius: 8px; padding: 10px; text-align: center; flex: 1; min-width: 45%; box-sizing: border-box; }
+        .stat-num { font-size: 18px; font-weight: bold; display: block; color: #00ffcc; }
+        .table-wrap { max-height: 180px; overflow-y: auto; font-size: 14px; border: 1px solid var(--border-dark); border-radius: 8px; width: 100%; background: #1a1a1a; }
+        .table-wrap table th, .table-wrap th { background-color: #2c2c2c !important; color: #00ffcc !important; font-weight: bold !important; }
+        .table-wrap table td, .table-wrap td { color: #ffffff !important; border-bottom: 1px solid #333333 !important; }
+
+       /* ประกาศสำตัญ
+        .floating-banner {
+            position: fixed; top: 20px; right: 20px; background: rgba(30, 30, 30, 0.95); border: 1px solid #333333; 
+            border-left: 4px solid #00ffcc; border-radius: 15px; padding: 15px 20px; color: #ffffff; font-family: Arial, sans-serif; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); z-index: 10000; text-align: center; user-select: none; 
+            animation: floatBounce 8s ease-in-out infinite alternate;
+        }
+        .floating-banner .banner-line1 { font-size: 14px; font-weight: bold; color: #00ffcc; margin-bottom: 2px; }
+        .floating-banner .banner-line2 { font-size: 12px; color: #ffcc00; }
+        .floating-banner .banner-line3 { font-size: 12px; color: #ffffff; }
+
+        @keyframes floatBounce {
+            0% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-30px) translateX(-40px); }
+            100% { transform: translateY(20px) translateX(30px); }
+        }  */
+
+        /* ขนาดกล้องถ่ายรูปที่เหมาะสมที่สุดบนมือถือ */
+#camera-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    width: 100%;
+}
+
+#video {
+    width: 250px !important;
+    height: 200px !important;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 3px solid #00ffcc;
+    background: #000;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+/* 🎯 กล่องสีดำแบบเต็มจอ */
+#realtime-monitor-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+    background: #121212;
+    border: none;
+    padding: 20px 15px;
+    z-index: 9999;
+    font-family: sans-serif;
+    color: #fff;
+    box-sizing: border-box;
+    display: none;         /* ซ่อนไว้เป็นค่าเริ่มต้น */
+    flex-direction: column;
+}
+
+.rt-title {
+    text-align: center;
+    color: #00ffcc;
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.rt-subtitle {
+    text-align: center;
+    color: #ffcc00;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+/* 🎯 ปรับให้พื้นที่รายชื่อขยายเต็มจอตามกล่อง (เลื่อนดูได้ยาวๆ) */
+#rt-list-container {
+    flex: 1;                  /* ยืดความสูงเต็มพื้นที่ที่เหลือ */
+    overflow-y: auto;         /* แสดง Scrollbar เมื่อรายการยาวเกินจอ */
+    touch-action: pan-y;
+    padding-right: 4px;
+    margin-top: 10px;
+}
+
+.rt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e1e1e;
+    padding: 8px 12px;
+    height: 42px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid #2a2a2a;
+    box-sizing: border-box;
+}
+
+.rt-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.rt-time {
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+</style>
 </head>
+
 <body>
-<script>
-  // ตรวจสอบว่าเปิดในแอป LINE หรือไม่
-  if (navigator.userAgent.indexOf('Line') > -1) {
-    // บังคับให้เด้งออกไปเปิดที่เบราว์เซอร์หลักของเครื่อง
-    window.location.href = window.location.href + (window.location.href.indexOf('?') > -1 ? '&' : '?') + 'openExternalBrowser=1';
-  }
-</script>
 
-<a href="#" class="btn-back" onclick="location.reload();">⬅ ย้อนกลับ</a>
+ <a href="javascript:void(0);" class="btn-back" onclick="location.reload();">⬅ ย้อนกลับ</a> 
+ <!--  <button type="button" class="btn-back" onclick="closeRealtimeMonitor()" style="
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: transparent;
+        border: 1px solid #00ffcc;
+        color: #00ffcc;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 99;">
+        ⬅ ย้อนกลับ (ออกจากระบบ)
+    </button>  -->
 
-<div class="container" id="main-interface">
+<div id="auth-screen" style="display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 8888; font-family: sans-serif;">
+    <div style="background: #1e1e1e; border: 1px solid #333; padding: 35px 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); width: 85%; max-width: 350px; text-align: center; box-sizing: border-box;">
+
+<!-- 📰 กล่องข่าววิ่ง (จะแสดงเฉพาะตอนรอใส่รหัสผ่านล็อกอิน)-->
+        <div style="background: #121212; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center;">
+          <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; margin-right: 8px; flex-shrink: 0;">ประกาศ1</span>
+          <marquee id="newsTicker" behavior="scroll" direction="left" scrollamount="4" style="font-size: 15px; color: #ddd;">
+             กำลังโหลด......
+          </marquee>
+        </div>
+
+        <div style="background: #121212; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center;">
+        <span style="background: #00ffcc; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; margin-right: 8px; flex-shrink: 0;">ประกาศ2</span>
+        <marquee id="newsTicker2" behavior="scroll" direction="left" scrollamount="3" style="font-size: 13px; color: #00ffcc;">
+            เข้างานก่อน 08:30 น. หักเงินสาย นาทีละ 1บาท สูงสุด 50บาทต่อวัน
+        </marquee>
+        </div>
+
+        <div style="font-size: 45px; margin-bottom: 12px;"><img src="SNAC.png" width="180" height="180" onerror="this.style.display='none'"></div>
+        <h2 style="font-size: 20px; font-weight: bold; color: #ffffff; margin: 0 0 5px 0;">หจก.แสงอนันต์การไฟฟ้า</h2>
+        <h2 style="font-size: 20px; font-weight: bold; color: #00ffcc; margin: 0 0 5px 0;">ระบบลงเวลา</h2>
+        <p style="font-size: 13px; color: #aaa; margin: 0 0 20px 0;">กรุณากรอกรหัสประจำตัว 4 หลักเพื่อเข้าสู่ระบบ</p>
+
+        <input type="text" id="emp-fcode-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="0000" oninput="validateEmployeeFcode(this)" autofocus
+               style="width: 100%; letter-spacing: 15px; text-align: center; font-size: 32px; padding: 10px; border: 2px solid #444; border-radius: 12px; outline: none; background: #121212; box-sizing: border-box; font-weight: bold; color: #00ffcc;">
+        
+        <div id="auth-status-msg" style="font-size: 14px; font-weight: bold; margin-top: 15px; min-height: 20px; color: #ff4d4d;"></div>
+        <div id="live-clock" style="text-align: center; font-size: 1rem; font-weight: bold; color: #ffcc00; background: #262626; padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px solid #333;"></div>
+
+        <button type="button" id="btn-show-monitor" onclick="openRealtimeMonitor()" style="
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background-color: #1a1a1a;
+        color: #00ffcc;
+        border: 2px solid #00ffcc;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;"> 👥 คลิก ใครมาทำงานวันนี้
+        </button>
+        </div>
+    </div>
+    <div class="container" id="main-interface">
     <h2>หจก.แสงอนันต์การไฟฟ้า<br>บันทึกเวลาทำงาน</h2>
-    <label>1. เลือกชื่อของคุณ:</label>
-    <select id="employee-select"><option value="">-- กำลังโหลดรายชื่อ... --</option></select>
+    <div style="background: #262626; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; color: #00ffcc; border: 1px solid #333;">
+        <span id="display-worker-name">👤 กรุณาใส่รหัสล็อกอินด้านบน</span>
+        <!-- ปุ่มกดเปิดดูรายชื่อพนักงาน -->
 
-    <label>2. ทำรายการ:</label>
-    <button class="btn btn-camera" id="start-camera">📸 เปิดกล้องถ่ายรูป</button>
-    <button class="btn btn-info-personal" id="get-personal-info">🔎 ข้อมูลบุคคล</button>
-    <div id="camera-box">
-        <video id="video" autoplay playsinline muted></video>
-        <button class="btn btn-snap" id="snap">📷 กดเพื่อถ่ายภาพ</button>
     </div>
 
-    <canvas id="canvas"></canvas>
+
+  
+    <!-- **************************************** -->
+    <!-- ซ่อนปุ่มเปิดกล้องเดิม ไม่ต้องกดแล้ว --> 
+<!-- <button class="btn btn-snap" id="start-camera" style="display: none;">📷 เปิดกล้องถ่ายรูป</button> -->
+<button class="btn btn-info-personal" id="get-personal-info" onclick="openPersonalDashboard()" style="background-color: #eac70c; color: #ffffff; border: none;">🔎 ดูข้อมูลทำงาน</button>
+
+<!-- กล่องกล้องจะแสดงผลและเปิดอัตโนมัติ -->
+<div id="camera-box">
+    <video id="video" autoplay playsinline muted></video>
+    <!-- ปุ่มกดถ่ายรูป -->
+    <button class="btn btn-snap" id="snap" style="width: auto; padding: 10px 20px;">📷 กดเพื่อถ่ายภาพ</button>
+    
+</div>
+<canvas id="canvas"></canvas>
+
+
     <div id="result">
-        <p><b>ชื่อ:</b> <span id="res-name"></span></p>
-        <p><b>เวลา:</b> <span id="res-time"></span></p>
+        <p style="margin:5px 0;"><b>ชื่อ:</b> <span id="res-name"></span></p>
+        <p style="margin:5px 0;"><b>เวลา:</b> <span id="res-time"></span></p>
     </div>
-
-    <div class="btn-group" id="btn-group">
+    <div class="btn-group" id="btn-group"style="display: none;">
         <button class="btn btn-in" onclick="confirmAndSend('In')">เข้างาน</button>
         <button class="btn btn-out" onclick="confirmAndSend('Out')">ออกงาน</button>
-	
+        <button class="btn btn-afternoon" id="btn-afternoon" onclick="confirmAndSend('เข้างานบ่าย')">เข้างานบ่าย</button>
     </div>
-
-    <div class="special-group" id="special-group">
-        <p style="text-align:center; font-size: 0.85rem; color: #777; margin-bottom: 10px;">-- กรณีอื่นๆ --</p>
+    <div class="special-group" id="special-group"style="display: none;">
+        <p style="text-align:center; font-size: 0.85rem; color: #aaa; margin-bottom: 10px;">-- กรณีอื่นๆ --</p>
         <button class="btn btn-leave" onclick="confirmAndSend('Vacation')">🌴 พักร้อน 1วัน</button>
         <button class="btn btn-absent" onclick="confirmAndSend('Absent')">🚫 ขาดงาน 1วัน</button>
-        <button class="btn btn-sick" onclick="confirmAndSend('Sick')">🤒 ป่วย</button>
+        <button class="btn btn-sick" onclick="confirmAndSend('Sick')">🚀 ป่วย</button>
     </div>
     <div id="loader">⏳ ระบบกำลังบันทึกข้อมูล...</div>
 </div>
@@ -89,95 +314,432 @@
 <div class="modal-overlay" id="common-modal">
     <div class="modal-box" id="modal-content-area"></div>
 </div>
+
+<div id="realtime-monitor-box">
+    <!-- Header กล่องเต็มจอ + ปุ่มปิด -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #00ffcc; font-size: 18px;">👥 รายชื่อพนักงานทำงานวันนี้</h3>
+        <button type="button" onclick="closeRealtimeMonitor()" style="
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;">✕ ปิด</button>
+    </div>
+
+    <!-- Container แสดงรายชื่อพนักงาน -->
+    <div id="rt-list-container">
+        <!-- รายชื่อจะถูกวาดลงตรงนี้ด้วย JavaScript -->
+    </div>
+</div>
+
+
+
+
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7IqI-anLT9OPqA6zoqO8PQKliPIdS2lsre9f_LjGlznVv045m_CcvNQ288couyOI/exec"; 
-    const video = document.getElementById('video'), canvas = document.getElementById('canvas'), startBtn = document.getElementById('start-camera'), snapBtn = document.getElementById('snap'), cameraBox = document.getElementById('camera-box'), selectEl = document.getElementById('employee-select');
-    const modal = document.getElementById('common-modal'), modalArea = document.getElementById('modal-content-area');
+window.currentLoggedPin = "";
 
-    window.onload = () => {
-        fetch(WEB_APP_URL + "?action=getEmployeeList").then(res => res.json()).then(data => {
-            selectEl.innerHTML = '<option value="">-- เลือกชื่อพนักงาน --</option>';
-            data.forEach(item => { 
-                let o = document.createElement('option'); o.value = o.text = item.name;
-                o.setAttribute('data-vacation-remain', item.vacationRemain); 
-                selectEl.add(o); 
-            });
-        }).catch(err => console.error("โหลดรายชื่อไม่สำเร็จ:", err));
-    };
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrIMgfV1wwpVDZ3F7WsQNe3c-1V-Qm-aGZD02roQodcZGmlPEh-tzZLAFc2KTF0Vk0/exec";
 
-function checkButtonDisplay() {
+// 🎵 1. ประกาศและโหลดไฟล์เสียงชัตเตอร์เตรียมพร้อมตั้งแต่เริ่มต้น
+const shutterSound = new Audio('shutter.mp3');
+shutterSound.preload = 'auto';
+
+// เด้งออกจากแอป LINE ไปเบราว์เซอร์ปกติ
+if (navigator.userAgent.indexOf('Line') > -1) {
+    window.location.href = window.location.href + (window.location.href.indexOf('?') > -1 ? '&' : '?') + 'openExternalBrowser=1';
+}
+
+// ตัวแปรสำหรับกล้องและสถานะระบบ
+window.selectedWorkerName = "";
+let imageDataUrl = "";
+let userGpsLocation = ""; 
+window.lateLimitTimeFromSheets = "08:30"; 
+
+let video, canvas, snapBtn, cameraBox, modal, modalArea;
+
+// 🟢 ระบบเริ่มต้นเมื่อ DOM โหลดสมบูรณ์
+window.addEventListener("DOMContentLoaded", function() {
+    // ผูก Element เข้ากับตัวแปรอย่างปลอดภัย
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    snapBtn = document.getElementById('snap');
+    cameraBox = document.getElementById('camera-box');
+    modal = document.getElementById('common-modal');
+    modalArea = document.getElementById('modal-content-area');
+
+    // นาฬิกาเรียลไทม์
+    setInterval(function() {
         let now = new Date();
-        let totalMinutes = (now.getHours() * 60) + now.getMinutes();
-        let switchTime = (11 * 60) + 30; // 💡 ตั้งเวลาเปิดปุ่มบ่ายที่ 11:30 น.
+        let dateThai = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+        let hours = now.getHours().toString().padStart(2, '0');
+        let minutes = now.getMinutes().toString().padStart(2, '0');
+        let seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        let clockEl = document.getElementById("live-clock");
+        if (clockEl) {
+            clockEl.innerHTML = "📅 " + dateThai + " ⏰ " + hours + ":" + minutes + ":" + seconds + " น.";
+        }
+    }, 1000);
 
-        // ค้นหาปุ่มเข้างานบ่ายจาก ID (แนะนำให้เติม id="btn-afternoon" ที่ตัวปุ่มใน HTML)
-        let afternoonBtn = document.getElementById('btn-afternoon'); 
+    // ซ่อนกล่องมอนิเตอร์
+    let monitorBox = document.getElementById("realtime-monitor-box");
+    if (monitorBox) monitorBox.style.display = 'none';
 
-        if (afternoonBtn) {
-            if (totalMinutes >= switchTime) {
-                afternoonBtn.style.style.setProperty('display', 'block', 'important'); // แสดงปุ่มบ่าย
-            } else {
-                afternoonBtn.style.style.setProperty('display', 'none', 'important');  // ซ่อนปุ่มบ่าย
+    // ดักจับปุ่มมอนิเตอร์
+    let btnMonitor = document.getElementById("btn-show-monitor");
+    if (btnMonitor) btnMonitor.addEventListener("click", openRealtimeMonitor);
+
+    // 📸 📸 [แก้ไขจุดพังที่ 1 & 2] ย้ายการผูกปุ่ม snapBtn มาไว้ภายใน DOMContentLoaded
+    if (snapBtn) {
+        snapBtn.onclick = function() {
+            // 🔊 1. เล่นเสียงชัตเตอร์
+            try {
+                shutterSound.currentTime = 0;
+                let playPromise = shutterSound.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log("Audio Error/Blocked:", e));
+                }
+            } catch (e) {
+                console.log("Audio Error:", e);
             }
+
+            // 📷 2. จับภาพลง Canvas
+            if (video && canvas) {
+                let captureSize = Math.min(video.videoWidth || 300, video.videoHeight || 600);
+                canvas.width = captureSize; 
+                canvas.height = captureSize;
+
+                let startX = (video.videoWidth - captureSize) / 2;
+                let startY = (video.videoHeight - captureSize) / 2;
+                
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(video, startX, startY, captureSize, captureSize, 0, 0, captureSize, captureSize);
+                    imageDataUrl = canvas.toDataURL('image/jpeg'); 
+                }
+            }
+            
+            // 👤 3. อัปเดตข้อความชื่อและเวลา
+            let resName = document.getElementById('res-name');
+            let resTime = document.getElementById('res-time');
+            if (resName) resName.innerText = window.selectedWorkerName || "";
+            if (resTime) resTime.innerText = new Date().toLocaleTimeString('th-TH');
+
+            // 🎯 4. สลับหน้าจออย่างแน่นอน (บังคับแสดงผลหน้าหลัก)
+            if (cameraBox) cameraBox.style.setProperty("display", "none", "important");
+
+            let resultBox = document.getElementById('result');
+            if (resultBox) resultBox.style.setProperty("display", "flex", "important");
+
+            let authScreen = document.getElementById('auth-screen');
+            if (authScreen) authScreen.style.setProperty("display", "none", "important");
+
+            let mainInterface = document.getElementById('main-interface');
+            if (mainInterface) mainInterface.style.setProperty("display", "block", "important");
+
+            let btnGroup = document.getElementById('btn-group');
+            if (btnGroup) btnGroup.style.setProperty("display", "flex", "important");
+
+            let specialGroup = document.getElementById('special-group');
+            if (specialGroup) specialGroup.style.setProperty("display", "flex", "important");
+
+            // 🛑 5. หยุดสตรีมกล้อง
+            if (video && video.srcObject) { 
+                video.srcObject.getTracks().forEach(track => track.stop()); 
+                video.srcObject = null;
+            }
+        };
+    }
+});
+
+// ฟังก์ชันเปิด-ปิด มอนิเตอร์
+function openRealtimeMonitor() {
+    var monitorBox = document.getElementById("realtime-monitor-box");
+    if (monitorBox) monitorBox.style.setProperty("display", "flex", "important");
+    if (typeof loadRealtimeMonitor === 'function') loadRealtimeMonitor();
+}
+
+function closeRealtimeMonitor() {
+    var monitorBox = document.getElementById("realtime-monitor-box");
+    if (monitorBox) monitorBox.style.setProperty("display", "none", "important");
+}
+
+function loadRealtimeMonitor() {
+    var cachedData = localStorage.getItem("rt_monitor_cache");
+    if (cachedData) {
+        try { renderMonitorList(JSON.parse(cachedData)); } catch(e) {}
+    }
+    var fetchUrl = WEB_APP_URL + "?action=getTodayAttendance&_t=" + new Date().getTime();
+    fetch(fetchUrl, { method: "GET", mode: "cors", redirect: "follow" })
+        .then(res => res.json())
+        .then(response => {
+            if (response && response.status === "success" && Array.isArray(response.data)) {
+                localStorage.setItem("rt_monitor_cache", JSON.stringify(response.data));
+                renderMonitorList(response.data);
+            } else {
+                renderMonitorList([]);
+            }
+        })
+        .catch(err => console.error("Monitor Fetch Error:", err));
+}
+
+function renderMonitorList(data) {
+    var container = document.getElementById("rt-list-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    // 1. หัวตาราง (Header) แบบเดิม
+    var headerHTML = 
+        '<div style="display: flex; justify-content: space-between; padding: 10px; background: #333; color: #ffcc00; font-weight: bold; border-radius: 6px; margin-top: 10px; font-size: 0.9rem;">' +
+            '<div style="flex: 2;">ชื่อพนักงาน</div>' +
+            '<div style="flex: 2; text-align: center;">เวลาเข้างาน</div>' +
+            '<div style="flex: 1.5; text-align: right;">หักเงินสาย</div>' +
+        '</div>';
+    
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = headerHTML + '<div style="text-align:center; color:#aaa; padding:20px;">ยังไม่มีข้อมูลการเข้างานวันนี้</div>';
+        return;
+    }
+    //ปรับขนาดตาราง
+    var listHTML = headerHTML + '<div style="max-height: 550px; overflow-y: auto; margin-top: 5px;">';
+
+    data.forEach(function(item) {
+        var statusText = "";
+        var statusColor = "#00ffcc"; // สีเขียวปกติสำหรับเวลาเข้างาน
+
+        // 🔍 ตรวจสอบค่าสถานะทั้ง 4 กรณี
+        if (item.Vacation) {
+            statusText = "พักร้อน1วัน";
+            statusColor = "#007bff"; // สีฟ้า
+        } else if (item.Vacationhalf) {
+            statusText = "พักร้อน0.5วัน";
+            statusColor = "#74b9ff"; // สีฟ้า
+        } else if (item.Absent) {
+            statusText = "ขาดงาน";
+            statusColor = "#ff7675"; // สีแดง
+        } else if (item.Sick) {
+            statusText = "ป่วย";
+            statusColor = "#ffeaa7"; // สีเหลือง
+        } else {
+            // ถ้าไม่มีสถานะลา/ขาด ให้แสดงเวลาเข้างานปกติ
+            var cleanTime = (item.timeIn && item.timeIn !== "undefined" && item.timeIn !== "null") ? item.timeIn : "--:-- น.";
+            if (cleanTime.includes(" ")) {
+                cleanTime = cleanTime.split(" ").pop(); 
+            }
+            statusText = cleanTime;
+        }
+
+        var fineAmount = item.fine !== undefined ? item.fine : "-"; 
+        var fineColor = (fineAmount !== "-" && Number(fineAmount) < 0) ? '#ff6b6b' : '#00ffcc';
+
+        listHTML += 
+            '<div class="rt-row" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem;">' +
+                '<div class="rt-name" style="flex: 2; color: #fff;">👤 ' + (item.name || 'ไม่ระบุชื่อ') + '</div>' +
+                '<div class="rt-time" style="flex: 2; text-align: center; color: ' + statusColor + '; font-weight: bold;">' + statusText + '</div>' +
+                '<div class="rt-fine" style="flex: 1.5; text-align: right; color: ' + fineColor + ';">' + fineAmount + '</div>' +
+            '</div>';
+    });
+
+    listHTML += '</div>';
+    container.innerHTML = listHTML;
+}
+
+// 📸 เปิดกล้องอัตโนมัติ
+async function autoStartCamera() {
+    if (!video) video = document.getElementById('video');
+    if (!video) return;
+
+    if (cameraBox) cameraBox.style.display = 'flex';
+
+    if (video.srcObject) {
+        let tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+    }
+
+    const constraintsList = [
+        { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+        { video: { facingMode: { exact: "user" } }, audio: false },
+        { video: true, audio: false }
+    ];
+
+    let stream = null;
+    for (let constraint of constraintsList) {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia(constraint);
+            if (stream) break;
+        } catch (e) {
+            console.warn("ลองสตรีมแบบต่อไป:", e);
         }
     }
 
-    // สั่งให้ระบบคำนวณเวลาทันทีหลังจากโหลดรายชื่อพนักงานเสร็จ
-    window.addEventListener('DOMContentLoaded', checkButtonDisplay);
-//****************************************************
-    startBtn.onclick = async () => {
-        if (!selectEl.value) return alert("กรุณาเลือกชื่อก่อนครับ");
-        try {
-            // ลองเปิดกล้องหน้าก่อน (ideal = ไม่บังคับ ถ้าไม่มีก็ใช้กล้องอื่นแทน)
-            const constraints = {
-                video: {
-                    facingMode: { ideal: "user" },
-                    width: { ideal: 320 },
-                    height: { ideal: 240 }
-                },
-                audio: false
-            };
+    if (stream) {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            video.play().catch(err => console.error("Video Play Error:", err));
+        };
+    } else {
+        alert("⚠️ ไม่สามารถเปิดกล้องได้ กรุณาเปิดเว็บผ่าน Chrome หรือ Safari และอนุญาตสิทธิ์การใช้กล้องครับ");
+    }
+}
 
-            let stream;
-            try {
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-            } catch (e) {
-                // Fallback: ถ้ากล้องหน้าไม่ได้เลย ลองกล้องทั่วไป
-                console.warn("กล้องหน้าไม่ได้ ลอง fallback:", e);
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+// 3. ระบบตรวจสอบรหัสพนักงาน
+function validateEmployeeFcode(el) {
+    const statusMsg = document.getElementById('auth-status-msg');
+    statusMsg.innerText = ""; 
+    el.value = el.value.replace(/[^0-9]/g, '');
+
+    if (el.value.length === 4) {
+        const codeValue = el.value;
+        el.disabled = true; 
+        statusMsg.style.color = "#3b82f6";
+        statusMsg.innerText = "⌛ กำลังตรวจสอบรหัสพนักงาน...";
+
+        // 🔊 กระตุ้นไฟล์เสียงไว้ล่วงหน้าทันทีที่กดรหัสผ่าน (ปลดล็อกนโยบาย Autoplay)
+        if (shutterSound) shutterSound.load();
+        
+        fetch(`${WEB_APP_URL}?action=verifyFcode&passcode=${codeValue}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success" || data.status === "success1234") {
+                window.currentLoggedPin = codeValue; 
+                statusMsg.style.color = "#10b981";
+                statusMsg.innerText = "✅ รหัสถูกต้อง กำลังเข้าสู่ระบบ...";
+                window.selectedWorkerName = data.name;
+
+                let monitorBox = document.getElementById('realtime-monitor-box');
+                if (monitorBox) {
+                  monitorBox.style.display = 'none';
+                  if (typeof realtimeTimer !== 'undefined') clearInterval(realtimeTimer);
+                }
+
+                let timeFromM1 = data.lateLimit || "08:30";
+                window.lateLimitTimeFromSheets = timeFromM1;
+                let showBox = document.getElementById("lateLimitTime") || document.getElementById("m1Value");
+                if (showBox) showBox.innerText = timeFromM1;
+
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('display-worker-name').innerText = "👤 ผู้ใช้งาน: " + data.name;
+
+                autoStartCamera();
+
+                if (data.status === "success1234") {
+                    document.getElementById('btn-group').style.display = 'flex'; 
+                    document.getElementById('special-group').style.display = 'flex'; 
+                } else {
+                    document.getElementById('btn-group').style.display = 'none';
+                    document.getElementById('special-group').style.display = 'none';
+                }
+
+                let delayTime = 400;
+                if (data.alreadyInTime && data.alreadyInTime !== "") {
+
+    // 🛑 1. ปิดกล้องและหยุดสตรีม
+    if (video && video.srcObject) {
+        let tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+    }
+    if (cameraBox) {
+        cameraBox.style.display = 'none';
+    }
+
+    // 🟢 2. เพิ่มส่วนนี้: สลับฉากหลังให้แสดงหน้าหลัก (ปุ่ม เข้า/ออก/สาย) ทันที
+    let authScreen = document.getElementById('auth-screen');
+    if (authScreen) authScreen.style.setProperty("display", "none", "important");
+
+    let mainInterface = document.getElementById('main-interface');
+    if (mainInterface) mainInterface.style.setProperty("display", "block", "important");
+
+    let btnGroup = document.getElementById('btn-group');
+    if (btnGroup) btnGroup.style.setProperty("display", "flex", "important");
+
+    let specialGroup = document.getElementById('special-group');
+    if (specialGroup) specialGroup.style.setProperty("display", "flex", "important");
+
+    // 3. แสดง Pop-up สรุปเวลาบันทึก
+    let cleanIn = data.alreadyInTime;
+    let cleanOut = data.alreadyOutTime || "--:--";
+    let overlayHTML = `
+        <div id="transparent-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); z-index: 8888; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px);">
+            <div style="background-color: rgba(255, 255, 255, 0.98); color: #1e40af; padding: 25px; border-radius: 16px; text-align: center; border: 2px solid #3b82f6; width: 85%; max-width: 340px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
+                <div style="font-size: 26px; margin-bottom: 5px;">📣</div>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1e3a8a;">บันทึกเวลาของวันนี้</div>
+                <div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                    <div style="flex: 1; border-right: 1px solid #e2e8f0; padding-right: 5px;">
+                        <div style="font-size: 13px; color: #64748b; font-weight: bold;">💵 เข้างาน</div>
+                        <div style="color: #10b981; font-size: 22px; font-weight: 800; margin-top: 5px;">${cleanIn}</div>
+                    </div>
+                    <div style="flex: 1; padding-left: 5px;">
+                        <div style="font-size: 13px; color: #64748b; font-weight: bold;">⛔ ออกงาน</div>
+                        <div style="color: ${cleanOut === '--:--' ? '#94a3b8' : '#ef4444'}; font-size: 22px; font-weight: 800; margin-top: 5px;">${cleanOut}</div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #6b7280; letter-spacing: 0.5px;">(สุขขี สุขขัง มีพลัง มีเงินเป็นถัง มีทองเป็นกะละมัง)</div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', overlayHTML);
+    delayTime = 5000;
+}
+
+
+                setTimeout(() => {
+                    const transparentOverlay = document.getElementById('transparent-popup-overlay');
+                    if (transparentOverlay) transparentOverlay.remove();
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(pos => {
+                            window.userGpsLocation = pos.coords.latitude + "," + pos.coords.longitude;
+                        }, err => { window.userGpsLocation = "ไม่ได้เปิดพิกัด"; });
+                    }
+                }, delayTime);
+
+            } else {
+                statusMsg.style.color = "#ef4444";
+                statusMsg.innerText = data.message || "❌ รหัสไม่ถูกต้อง";
+                el.value = ""; el.disabled = false; el.focus();
+            }
+        })
+        .catch(err => {
+            statusMsg.style.color = "#ef4444";
+            statusMsg.innerText = "❌ เกิดข้อผิดพลาด กรุณาลองใหม่";
+            el.disabled = false; el.value = ""; el.focus();
+        });
+    }
+}
+
+
+    // 🎯 ระบบคำนวณและกางหน้าต่างยืนยัน (Modal) ป้องกันพนักงานกดผิด
+    // (เรียกใช้ค่าเวลาแปรผันตาม M1 จากหน้าบ้านตรง ๆ ไม่สับสน)
+    function confirmAndSend(status) {
+        if (!window.selectedWorkerName) return alert("ไม่พบข้อมูลพนักงาน");
+
+        if (status === 'In') {
+            let now = new Date();
+            let currentMinutes = (now.getHours() * 60) + now.getMinutes();
+            
+            let hh = 8;
+            let mm = 30; // ค่าเริ่มต้นแบคอัพคือ 08:30 น.
+
+            // 🛠️ ดึงค่าเวลาสายที่บราวเซอร์จำไว้จาก M1 (เช่น "08:30" หรือเวลารูปแบบอื่น)
+            let m1Time = window.lateLimitTimeFromSheets;
+            if (m1Time && m1Time.indexOf(":") !== -1) {
+                let parts = m1Time.split(":");
+                hh = parseInt(parts[0], 10);
+                mm = parseInt(parts[1], 10);
             }
 
-            video.srcObject = stream;
-            await video.play(); // await ให้มั่นใจว่า iOS เล่นได้จริง
-            cameraBox.style.display = 'block';
-            startBtn.style.display = 'none';
-            document.getElementById('get-personal-info').style.display = 'none';
+            let limitMinutes = (hh * 60) + mm; 
 
-       // } catch (err) {
-       //     console.error("เปิดกล้องไม่สำเร็จ:", err);
-       //     alert("ไม่สามารถเปิดกล้องได้\n\n✅ วิธีแก้:\n- เปิดลิงก์นี้ด้วย Chrome หรือ Safari\n- อย่าเปิดในแอป 
-       //LINE\n- กด 'อนุญาต' เมื่อระบบขอสิทธิ์กล้องครับ");
-       // }
-       } catch (err) {
-    // แสดง error จริงๆ ออกมาเลย
-    alert("Error: " + err.name + "\n\n" + err.message);
-}
-    };
+            if (currentMinutes > limitMinutes) { 
+                status = 'Late'; 
+            }
+        }
 
-    snapBtn.onclick = () => {
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width = video.videoWidth, canvas.height = video.videoHeight);
-        video.srcObject.getTracks().forEach(t => t.stop());
-        cameraBox.style.display = 'none';
-        window.capturedTime = new Date().toLocaleString('th-TH', { hour12: false, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
-        document.getElementById('res-name').innerText = window.workerName = selectEl.value;
-        document.getElementById('res-time').innerText = window.capturedTime;
-        document.getElementById('result').style.display = document.getElementById('btn-group').style.display = document.getElementById('special-group').style.display = 'flex';
-    };
-
-    function openModal(html) { modalArea.innerHTML = html; modal.style.display = 'flex'; }
-    function closeModal() { modal.style.display = 'none'; }
-    function confirmAndSend(status) {
-        // 🔒 บล็อกปุ่มออกงานก่อนเวลา 13:00 น.
         if (status === 'Out') {
             let now = new Date();
             if (now.getHours() < 13) {
@@ -185,166 +747,243 @@ function checkButtonDisplay() {
             }
         }
 
-        // 😭 เช็คสิทธิ์วันลาพักร้อนหมด
-        if (status === 'Vacation' || status === 'VacationHalf') {
-            let remain = Number(selectEl.options[selectEl.selectedIndex].getAttribute('data-vacation-remain'));
-            if (remain <= 0) {
-                let count = 5;
-                openModal(`
-                    <div class="cry-emoji">😭</div>
-                    <div class="cry-text">วันลาพักร้อนหมด</div>
-                    <div class="countdown-text" id="cd-timer">ระบบจะกลับสู่หน้าหลักอัตโนมัติใน 5 วินาที...</div>
-                `);
-                let timer = setInterval(() => { count--; document.getElementById('cd-timer').innerText = `ระบบจะกลับสู่หน้าหลักอัตโนมัติใน ${count} วินาที...`; if (count <= 0) { clearInterval(timer); location.reload(); } }, 1000);
-                return;
-            }
-        }
-
-        // ⏱️ ระบบคัดกรองเวลาสาย 08:30 น.
-        if (status === 'In') {
-            let limitHours = 8, limitMinutes = 30;
-            let now = new Date();
-            if ((now.getHours() > limitHours) || (now.getHours() === limitHours && now.getMinutes() > limitMinutes)) {
-                openModal(`
-                    <div style="font-size: 50px; text-align: center;">⏰</div>
-                    <h3 style="font-size:22px; font-weight:bold; text-align:center; color:var(--danger); margin-bottom:5px;">เข้างานสาย !!!</h3>
-                    <p style="text-align:center; font-size:14px; color:#555; margin-bottom:15px;">ขณะนี้เกินเวลากำหนดเข้างาน (08:30 น.) แล้ว</p>
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-
-		       <button  type="button"class="btn btn-vacation-half" style="margin:0; padding:12px; background:#ffc107; color:#000; "onclick="closeModal(); confirmAndSend('VacationHalf');">
-  ⛱️ ลาพักร้อน 1/2 วัน (ครึ่งเช้า)</button>
-                       <button class="btn btn-leave" style="display: none; margin:0; padding:12px; background:#4a148c;" onclick="setLateStatus('Vacation')">🌴 ใช้ ลาพักร้อน 1 วัน (ลาเต็มวัน)</button>
-                       <button class="btn btn-absent" style="display: none; margin:0; padding:12px;" onclick="setLateStatus('Absent')">🚫 ใช้ ขาดงาน</button> 
-
-                        <button type="button" id="btn-afternoon" class="btn btn-in" style="margin:0; padding:12px; background:var(--success);" 
-        onclick="closeModal(); confirmAndSend('เข้างานบ่าย'); ">
-  ☀️ เข้างานบ่าย (ลาครึ่งเช้ามาแล้ว)</button>
-                    </div>
-
-                    <button class="btn-info-personal" style="width:100%; border:none; padding:10px; border-radius:8px; font-weight:bold; margin-top:15px; background:#eee;" onclick="location.reload()">❌ ยกเลิก&กลับหน้าหลัก ❌</button>
-                `);
-                return;
-            }
-        }
-
-        const labels = { 'In': 'เข้างาน', 'Out': 'ออกงาน', 'Vacation': 'พักร้อนเต็มวัน / ลาต่อบ่าย', 'VacationHalf': 'พักร้อน 1/2 วัน', 'Absent': 'ขาดงาน', 'Sick': 'ป่วย' };
-        openModal(`<h3 style="font-size:20px;font-weight:bold;text-align:center;">🔔 ยืนยันบันทึก "${labels[status]}"</h3>
-            <div style="background:#f8f9fa;padding:12px;border-radius:8px;text-align:left;border-left:5px solid var(--primary);margin:15px 0;">
-                <p style="margin:5px 0;"><b>ชื่อ:</b> ${window.workerName}</p>
-                <p style="margin:5px 0;"><b>เวลา:</b> ${window.capturedTime}</p>
-            </div>
-            <div class="modal-btn-group">
-                <button id="confirm-submit-btn" class="btn-in" style="border:none;padding:12px;border-radius:8px;font-weight:bold;" onclick="sendToSheet('${status}')">✅ ยืนยัน</button>
-                <button id="cancel-submit-btn" class="btn-absent" style="border:none;padding:12px;border-radius:8px;font-weight:bold;" onclick="location.reload()">❌ ยกเลิก</button>
-            </div>`);
-    }
-
-    function setLateStatus(chosenStatus) {
-        closeModal();
-        confirmAndSend(chosenStatus);
-    }
-
-    function sendToSheet(status) {
-        const confirmBtn = document.getElementById('confirm-submit-btn');
-        const cancelBtn = document.getElementById('cancel-submit-btn');
-        if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.6"; confirmBtn.innerHTML = "⌛ กำลังบันทึก..."; }
-        if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.style.opacity = "0.6"; }
-        document.getElementById('btn-group').style.display = document.getElementById('special-group').style.display = 'none';
-        document.getElementById('loader').style.display = 'block';
-
-        const executeFetch = (gpsValue) => {
-            fetch(WEB_APP_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ 
-                    name: window.workerName, 
-                    time: window.capturedTime, 
-                    status: status, 
-                    image: canvas.toDataURL('image/jpeg', 0.4).split(',')[1] || '', 
-                    gps: gpsValue 
-                }) 
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") { alert("บันทึกสำเร็จ! 🎉"); location.reload(); } 
-                else { alert("ล้มเหลว: " + data.message); closeModal(); showButtons(); }
-            })
-            .catch(() => { alert("ข้อผิดพลาดการเชื่อมต่อ"); closeModal(); showButtons(); });
+        const labels = { 
+            'In': 'เข้างานปกติ', 'Late': 'เข้างานสาย ⚠️', 'เข้างานบ่าย': 'เข้างานบ่าย', 
+            'Out': 'ออกงาน', 'Vacation': 'พักร้อน 1วัน', 'VacationHalf': 'พักร้อน 1/2 วัน', 
+            'Absent': 'ขาดงาน 1วัน', 'Sick': 'ป่วย' 
         };
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    let gpsCoords = position.coords.latitude + "," + position.coords.longitude;
-                    executeFetch(gpsCoords);
-                },
-                (error) => {
-                    executeFetch("ปิด GPS หรือไม่ได้รับสิทธิ์");
-                },
-                { enableHighAccuracy: true, timeout: 5000 }
-            );
-        } else {
-            executeFetch("อุปกรณ์ไม่รองรับ GPS");
+        let currentTimeText = new Date().toLocaleTimeString('th-TH');
+        let btnHtml = `
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                <button class="btn" style="background:#10b981; color:white; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:0;" onclick="sendToSheet('${status}')">บันทึก ${labels[status]}</button>
+                <button class="btn" style="background:#64748b; color:white; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:0;" onclick="closeModal()">❌ ยกเลิก</button>
+            </div>
+        `;
+        if (status === 'Late') {
+            btnHtml = `
+                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                    <button class="btn" style="background:#ef4444; color:white; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:0;" onclick="sendToSheet('Late')">⚠️ ยืนยันเข้างานสาย</button>
+                    <button class="btn" style="background:#8b5cf6; color:white; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:0;" onclick="closeModal(); confirmAndSend('VacationHalf');">🌗 เปลี่ยนเป็นลาพักร้อน 1/2 วัน</button>
+                    <button class="btn" style="background:#64748b; color:white; padding:12px; border-radius:8px; font-weight:bold; margin-bottom:0;" onclick="closeModal()">❌ ยกเลิก</button>
+                </div>
+            `; // 💡 ปรับปุ่มยกเลิกของสายเป็น closeModal() หน้าจอจะได้ไม่กระตุกครับ
         }
+
+        modalArea.innerHTML = `
+            <h3 style="margin-top:0; color:#00ffcc; text-align:center;">ยืนยันข้อมูลลงเวลา</h3>
+            <p style="margin:6px 0;"><b>👤 พนักงาน:</b> ${window.selectedWorkerName}</p>
+            <p style="margin:6px 0;"><b>📌 Status:</b> <span style="color:#3b82f6; font-weight:bold;">${labels[status]}</span></p>
+            <p style="margin:6px 0; margin-bottom:20px;"><b>⏰ เวลาปัจจุบัน:</b> ${currentTimeText}</p>
+            ${btnHtml}
+        `;
+        modal.style.display = 'flex';
     }
 
-    function showButtons() { 
-        document.getElementById('loader').style.display = 'none'; 
-        document.getElementById('btn-group').style.display = document.getElementById('special-group').style.display = 'flex'; 
-    }
-    document.getElementById('get-personal-info').onclick = () => {
-        if(!selectEl.value) return alert("กรุณาเลือกชื่อก่อนครับ");
-        openModal(`<h3 style="font-size:18px;font-weight:bold;text-align:center;">🔐 ยืนยันตัวตน</h3>
-            <p style="font-size:13px;color:#666;text-align:center;">กรอกเลขท้าย 4 ตัวเลขบัตรประชาชนของ<br><b>${selectEl.value}</b></p>
-            <input type="password" pattern="[0-9]*" inputmode="numeric" maxlength="4" class="pin-input" id="single-pin" oninput="handlePinInput(this)">
-            <button class="btn-absent" style="width:100%;border:none;padding:10px;border-radius:8px;font-weight:bold;" onclick="closeModal()">❌ ยกเลิก</button>`);
-        document.getElementById('single-pin').focus();
-    };
+    function closeModal() { modal.style.display = 'none'; }	
 
-        function handlePinInput(el) {
-        if(el.value.length === 4) {
-            const pin = el.value, name = selectEl.value;
-            closeModal();
-            document.getElementById('main-interface').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
+    // 🚀 ฟังก์ชันเด็ดขาด ส่งข้อมูลพุ่งตรงไปยังหลังบ้าน Google Sheets เช็กกฎเหล็ก
+    function sendToSheet(status) {
+        const modalArea = document.getElementById('modal-content-area');
+        if (modalArea) {
+            modalArea.innerHTML = `
+                <div style="text-align:center; padding: 20px 10px;">
+                    <h3 style="margin-top:0; color:#3b82f6; font-size: 20px;">กำลังตรวจสอบเงื่อนไข...</h3>
+                    <p style="color:#475569; margin:4px 0; font-size: 15px;">ระบบกำลังเช็คกฎการบันทึกเวลา</p>
+                </div>
+            `;
+        }
+        let now = new Date();
+        let timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        
+        // 🎯 [แก้ไขจุดสำคัญ] ไม่ว่าจะสถานะไหน (รวมถึง ลาพักร้อน ขาดงาน ป่วย) ก็จะดึงค่า GPS ส่งไปด้วยเสมอ
+        let gpsData = window.userGpsLocation || "ไม่ได้เปิดพิกัด";
+        let finalImg = imageDataUrl || "";
 
-            fetch(`${WEB_APP_URL}?action=getEmployeeSummary&name=${encodeURIComponent(name)}&idLast4=${pin}`)
-            .then(res => res.json()).then(data => {
-                document.getElementById('loader').style.display = 'none';
-                if(data.status === "success") {
-                    let rows = '';
-                    data.logs.forEach(r => rows += `<tr><td>${r.date.split("T")[0]}</td><td>${r.vacation==1?'💡':(r.vacation==0.5?'🌗':'-')}</td><td>${r.absent==1?'❌':'-'}</td><td>${r.sick==1?'😭':'-'}</td><td>${r.work==1?'✅':'-'}</td></tr>`);
-                    
-                    // 🎯 [แก้ไขจุดนี้] สร้างตัวแปรก่อนดึงไปแสดงผลด้านล่าง เพื่อไม่ให้ระบบ Error
-                    let remainingVacation = data.dashboard.remainingVacation !== undefined ? data.dashboard.remainingVacation : "0";
+let payload = {
+    name: window.selectedWorkerName,
+    status: status,
+    time: timeStr,   
+    gps: gpsData, // ส่งพิกัด GPS
+    image: finalImg // 👈 มีการแนบรูปภาพส่งไปพร้อมกับข้อมูลเรียบร้อยแล้วครับ!
+};
 
-                    openModal(`<h3 style="font-size:18px;font-weight:bold;color:var(--success);text-align:center;margin-bottom:10px;">📊 ข้อมูลบุคคล</h3>
-                        <p style="margin:5px 0;font-size:15px;"><b>👤 ชื่อ:</b> ${data.dashboard.name}</p>
-                        
-                        <div style="background:#fff9db;padding:10px;border-radius:6px;font-size:14px;font-weight:bold;color:#b45309;border-left:4px solid #f59e0b;margin-bottom:10px;text-align:center;">
-                            🌴 พักร้อนคงเหลือ ${remainingVacation} วัน
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.text())
+        .then(textData => {
+            let data = JSON.parse(textData);
+            if (data.status === "success") {
+                if (modalArea) {
+                    modalArea.innerHTML = `
+                        <div style="text-align:center; padding: 20px 10px;">
+                            <div style="font-size: 45px; color: #10b981; margin-bottom: 10px;">🎉</div>
+                            <h3 style="margin-top:0; color:#10b981; font-size: 20px;">บันทึกข้อมูลสำเร็จ!</h3>
+                            <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-top:15px;">
+                                <p style="margin:0; font-size: 14px; color:#64748b;">ค่าเวลาปัจจุบัน</p>
+                                <p style="margin:0; font-weight:bold; color:#1e293b; font-size: 18px;">web.time = "${timeStr}"</p>
+                            </div>
                         </div>
-
-                        <div style="background:#e7f1ff;padding:8px;border-radius:6px;font-size:13px;border-left:4px solid var(--primary);margin-bottom:10px;"><b>ℹ️ หมายเหตุ: ข้อมูลจะเป็นปัจจุบัน หลัง20.00น</b> ${data.dashboard.note || "-"}</div>
-                        
-                        <div class="stat-grid">
-                            <div class="stat-card"><span style="font-size:11px;color:#666;">งาน</span><span class="stat-num" style="color:var(--success);">${data.dashboard.sumwork || 0}</span></div>
-                            <div class="stat-card"><span style="font-size:11px;color:#666;">พักร้อน</span><span class="stat-num" style="color:var(--purple);">${data.dashboard.vacation || 0}</span></div>
-                            <div class="stat-card"><span style="font-size:11px;color:#666;">ขาด</span><span class="stat-num" style="color:var(--danger);">${data.dashboard.absent || 0}</span></div>
-                            <div class="stat-card"><span style="font-size:11px;color:#666;">ป่วย</span><span class="stat-num" style="color:var(--info);">${data.dashboard.sick || 0}</span></div>
-                        </div>
-                        <p style="font-weight:bold;font-size:13px;margin:5px 0;">📅 ประวัติย้อนหลัง:</p>
-                        <div class="table-wrap"><table style="width:100%;text-align:center;border-collapse:collapse;"><thead style="background:#f1f1f1;position:sticky;top:0;"><tr><th>วันที่</th><th>ลา</th><th>ขาด</th><th>ป่วย</th><th>งาน</th></tr></thead><tbody>${rows}</tbody></table></div>
-                        <button class="btn-absent" style="width:100%;border:none;padding:12px;border-radius:8px;font-weight:bold;margin-top:15px;background:#333;color:#fff;" onclick="location.reload()">🔒 ปิดหน้านี้</button>`);
-                } else { 
-                    alert('🛑 รหัสไม่ถูกต้อง!'); 
-                    location.reload(); 
+                    `;
                 }
-            }).catch(() => { 
-                alert('ข้อผิดพลาดระบบ'); 
-                location.reload(); 
-            });
+                setTimeout(() => { location.reload(); }, 3000);
+          } else {
+                if (modalArea) {
+                    modalArea.innerHTML = `
+                        <div style="text-align:center; padding: 20px 10px;">
+                            <div style="font-size: 45px; color: #ef4444; margin-bottom: 10px;">❌</div>
+                            <h3 style="margin-top:0; color:#ef4444; font-size: 18px;">บันทึกไม่สำเร็จ!</h3>
+                            <p style="color:#1e293b; font-weight:bold; margin:10px 0; font-size: 15px;">${data.message}</p>
+                            <p style="color:#64748b; font-size: 13px;">(ระบบปฏิเสธการลงเวลาเนื่องจากผิดเงื่อนไข)</p>
+                        </div>
+                    `;
+                }
+                setTimeout(() => { location.reload(); }, 3000);
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            alert("❌ การเชื่อมต่อขัดข้อง กรุณาลองใหมี่อีกครั้ง");
+            location.reload();
+        });
+    }
+
+
+ // 📊 ฟังก์ชันดึงประวัติข้อมูลบุคคล (เวอร์ชันแก้ไขสมบูรณ์)
+function openPersonalDashboard() {
+    if (!window.selectedWorkerName) {
+        return alert("ระบบไม่พบข้อมูลการยืนยันตัวตน กรุณารีเฟรชหน้าจอใหม่");
+    }
+
+    // 💡 ค้นหาและเตรียมพื้นที่ Modal
+    let modalElement = document.getElementById("modal");
+    let modalAreaElement = document.getElementById("modalArea");
+    
+    // เคสป้องกันหากเขียนชื่อตัวแปรไม่ตรงกับ ID ใน HTML
+    if (!modalElement || !modalAreaElement) {
+        modalElement = modal; // fallback ใช้ตัวแปร Global
+        modalAreaElement = modalArea;
+    }
+
+    modalAreaElement.innerHTML = `<div style="text-align:center; padding: 20px;">⏳ กำลังดึงสถิติสะสมของ คุณ ${window.selectedWorkerName}...</div>`;
+    modalElement.style.display = "flex";
+
+    let getSummaryUrl = `${WEB_APP_URL}?action=getEmployeeSummary&name=${encodeURIComponent(window.selectedWorkerName)}`;
+    
+    fetch(getSummaryUrl)
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success" && data.dashboard) {
+            let db = data.dashboard;
+            let rowsHtml = "";
+            
+            if (data.logs && data.logs.length > 0) {
+                data.logs.forEach(log => {
+                    if (!log.date) return;
+                    let dateStr = log.date.toString().trim();
+                    if (dateStr.includes("T")) {
+                        dateStr = dateStr.split("T")[0];
+                    }
+
+                    // 💡 แก้ไข: ดักจับทั้ง ลาเต็มวัน (1) และลาครึ่งวัน (0.5 หรือ -0.5)
+                    let vVal = Number(log.vacation) || 0;
+                    let vacationCell = (vVal === 1 || vVal === 0.5 || vVal === -0.5) ? "📌" : "-";
+                    
+                    let absentCell = Number(log.absent) >= 1 ? "🅾" : "-";
+                    let sickCell = Number(log.sick) >= 1 ? "👾" : "-";
+                    
+                    let wVal = Number(log.work) || 0;
+                    let workCell = (wVal === 1 || wVal === 0.5) ? "✔️" : "-";
+
+                    rowsHtml += `
+                        <tr style="border-bottom: 1px solid #eee;"> 
+                            <td style="padding:6px; color:#ffff; font-size: 12px; ">${dateStr}</td>
+                            <td style="padding:6px; font-size: 12px;">${vacationCell}</td>
+                            <td style="padding:6px; font-size: 12px;">${absentCell}</td>
+                            <td style="padding:6px; font-size: 12px;">${sickCell}</td>
+                            <td style="padding:6px; font-size: 12px;">${workCell}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            if (rowsHtml === "") {
+                rowsHtml = `<tr><td colspan="5" style="padding:15px; color:#999; font-size: 12px;">ยังไม่มีประวัติการบันทึกในเดือนนี้</td></tr>`;
+            }
+
+            modalAreaElement.innerHTML = `
+                <h3 style="font-size:18px;font-weight:bold;color:#00ffcc;text-align:center;margin-bottom:10px;">📊 ข้อมูลทำงาน</h3>
+                <p style="margin:5px 0;font-size:15px;"><b>👤 ชื่อ:</b> ${db.name}</p>
+                
+                <div style="background:#fff9db;padding:10px;border-radius:6px;font-size:14px;font-weight:bold;color:#b45309;border-left:4px solid #f59e0b;margin-bottom:10px;text-align:center;">
+                    🌴 พักร้อนคงเหลือ ${db.remainingVacation} วัน
+                </div>
+
+                <div style="background:#1a1a1a;padding:8px;border-radius:6px;font-size:13px;border-left:4px solid var(--primary);margin-bottom:10px;">
+                    <b>ℹ️ หมายเหตุ: ข้อมูลจะเป็นปัจจุบัน หลัง22.00น</b>
+                </div>
+                
+                <div class="stat-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                
+                  <div class="stat-card" style="background:#ffffff; padding:10px; border-radius:6px; text-align:center; border:1px solid #eee;"><span style="font-size:11px;color:#666;display:block;">วันทำงานสะสม</span><span class="stat-num"style="font-size:18px; font-weight:bold; color:#28a745;">${db.sumwork|| 0}</span></div>
+                   
+                  <div class="stat-card" style="background:#ffffff; padding:10px; border-radius:6px; text-align:center; border:1px solid #eee;"><span style="font-size:11px;color:#666;display:block;">พักร้อน</span><span class="stat-num"style="font-size:18px; font-weight:bold;color:#17a2b8;">${db.vacation || 0}</span></div>
+                
+                  <div class="stat-card" style="background:#ffffff; padding:10px; border-radius:6px; text-align:center; border:1px solid #eee;"><span style="font-size:11px;color:#666;display:block;">ขาดงาน</span><span class="stat-num" style="font-size:18px; font-weight:bold; color:#17a2b8;">${db.absent || 0}</span></div>
+                
+                  <div class="stat-card" style="background:#ffffff; padding:10px; border-radius:6px; text-align:center; border:1px solid #eee;"><span style="font-size:11px;color:#666;display:block;">ป่วย</span><span class="stat-num" style="font-size:18px; font-weight:bold; color:#17a2b8;">${db.sick || 0}</span></div>
+
+                </div>
+                
+                <p style="font-weight:bold;font-size:13px;margin:5px 0;">📅 ประวัติย้อนหลัง-ประจำเดือน:</p>
+                
+                <div class="table-wrap" style="max-height: 200px; overflow-y: auto; border: 1px solid #444444; border-radius: 8px;"> 
+                    <table style="width:100%; text-align:center; border-collapse:collapse;">
+                        <thead style="background:#2c2c2c; position:sticky; top:0; z-index: 10;">
+                            <tr>
+                                <th style="padding: 8px; font-size: 12px; border-bottom: 1px solid #ddd;">วันที่</th>
+                                <th style="padding: 8px; font-size: 12px; border-bottom: 1px solid #ddd;">ลา</th>
+                                <th style="padding: 8px; font-size: 12px; border-bottom: 1px solid #ddd;">ขาด</th>
+                                <th style="padding: 8px; font-size: 12px; border-bottom: 1px solid #ddd;">ป่วย</th>
+                                <th style="padding: 8px; font-size: 12px; border-bottom: 1px solid #ddd;">งาน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn" style="width:100%;border:none;padding:12px;border-radius:8px;font-weight:bold;margin-top:12px;background:#333;color:#fff;cursor:pointer;font-size: 15px;" onclick="closeModal()">🔒 ปิดหน้านี้</button>
+            `;
+        } else {
+            modalAreaElement.innerHTML = `<div style="text-align:center; padding:20px; color:red;">❌ ไม่พบข้อมูลสถิติในระบบ หรือไฟล์ตารางยังไม่ได้ประมวลผล</div>
+            <button class="btn" style="background:#6c757d; color:white; margin-top:10px; padding:10px; border-radius:8px; width:100%; border:none; cursor:pointer;" onclick="closeModal()">ปิดหน้าต่าง</button>`;
+        }
+    })
+    .catch(err => {
+        console.error("Dashboard Error:", err);
+        modalAreaElement.innerHTML = `<div style="text-align:center; padding:20px; color:red;">❌ เกิดข้อผิดพลาดทางเทคนิคในการดึงข้อมูล</div>
+        <button class="btn" style="background:#6c757d; color:white; margin-top:10px; padding:10px; border-radius:8px; width:100%; border:none; cursor:pointer;" onclick="closeModal()">ปิดหน้าต่าง</button>`;
+    });
+}
+
+    // ฟังก์ชันเปิด-ปิดปุ่มเข้างานบ่ายตามช่วงเวลา
+    function checkButtonDisplay() {
+        let now = new Date();
+        let totalMinutes = (now.getHours() * 60) + now.getMinutes();
+        let switchTime = (11 * 60) + 30; 
+        let afternoonBtn = document.getElementById('btn-afternoon'); 
+        if (afternoonBtn) {
+            if (totalMinutes >= switchTime) afternoonBtn.style.setProperty('display', 'block', 'important'); 
+            else afternoonBtn.style.setProperty('display', 'none', 'important');  
         }
     }
+    setInterval(checkButtonDisplay, 1000); //นับเวลาให้ปุ่มทำงาน ทุก1วิ
+
+ 
+   
 
 </script>
 </body>
